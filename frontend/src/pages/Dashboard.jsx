@@ -8,7 +8,10 @@ import CategoryPieChart from '../components/CategoryPieChart';
 import TrendLineChart from '../components/TrendLineChart';
 import ProgressBar from '../components/ProgressBar';
 import AddExpenseForm from '../components/AddExpenseForm';
+<<<<<<< HEAD
 import AIInsightsCard from '../components/AIInsightsCard';
+=======
+>>>>>>> 8c3dbfe6226359150da2425b986711c8521c475d
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -120,9 +123,12 @@ export default function Dashboard() {
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* AI insights */}
         <AIInsightsCard />
 
+=======
+>>>>>>> 8c3dbfe6226359150da2425b986711c8521c475d
         {/* Budgets and goals */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-surface border border-white/5 rounded-xl p-5">

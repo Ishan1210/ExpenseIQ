@@ -17,7 +17,10 @@ app.use('/api/expenses', require('./routes/expense.routes'));
 app.use('/api/income', require('./routes/income.routes'));
 app.use('/api/budgets', require('./routes/budget.routes'));
 app.use('/api/goals', require('./routes/goal.routes'));
+<<<<<<< HEAD
 app.use('/api/ai', require('./routes/ai.routes'));
+=======
+>>>>>>> 8c3dbfe6226359150da2425b986711c8521c475d
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });

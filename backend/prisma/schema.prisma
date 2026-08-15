@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  expenses      Expense[]
+  income        Income[]
+  budgets       Budget[]
+  goals         Goal[]
+  subscriptions Subscription[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  userId      String
+  amount      Decimal  @db.Decimal(10, 2)
+  category    String
+  description String?
+  receiptUrl  String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+  @@index([userId])
+}
+
+model Income {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Decimal  @db.Decimal(10, 2)
+  source    String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("income")
+  @@index([userId])
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  userId    String
+  category  String
+  limit     Decimal  @db.Decimal(10, 2)
+  period    String   @default("monthly")
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("budgets")
+  @@index([userId])
+}
+
+model Goal {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  targetAmount  Decimal  @db.Decimal(10, 2)
+  savedAmount   Decimal  @db.Decimal(10, 2) @default(0)
+  deadline      DateTime?
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+  @@index([userId])
+}
+
+model Subscription {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  amount    Decimal  @db.Decimal(10, 2)
+  billingCycle String @default("monthly")
+  nextDue   DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([userId])
+}

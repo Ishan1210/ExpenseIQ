@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createExpense } from '../api/expenses';
+import { scanReceipt } from '../api/ocr';
 
 const CATEGORIES = ['Food', 'Transport', 'Rent', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Other'];
 
@@ -9,6 +10,35 @@ export default function AddExpenseForm({ onAdded, onClose }) {
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanNote, setScanNote] = useState('');
+
+  async function handleReceiptUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setScanning(true);
+    setScanNote('');
+    setError('');
+
+    try {
+      const result = await scanReceipt(file);
+
+      if (result.amount) setAmount(result.amount);
+      if (result.merchant) setDescription(result.merchant);
+
+      setScanNote(
+        result.amount
+          ? `Scanned — found amount ₹${result.amount}${result.merchant ? ` from "${result.merchant}"` : ''}. Review before saving.`
+          : 'Scanned, but could not confidently detect an amount — please fill manually.'
+      );
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to scan receipt');
+    } finally {
+      setScanning(false);
+      e.target.value = ''; // allow re-selecting the same file
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -29,6 +59,28 @@ export default function AddExpenseForm({ onAdded, onClose }) {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
       <div className="bg-surface border border-white/10 rounded-xl p-6 w-full max-w-sm">
         <h3 className="font-display text-lg font-semibold text-white mb-4">Add expense</h3>
+
+        {/* Receipt scan */}
+        <label className="flex items-center justify-center gap-2 border border-dashed border-white/20 rounded-lg py-3 mb-4 text-sm text-mist hover:border-gold/50 hover:text-gold transition cursor-pointer">
+          {scanning ? (
+            <span>Scanning receipt...</span>
+          ) : (
+            <span>📷 Scan a receipt to auto-fill</span>
+          )}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleReceiptUpload}
+            disabled={scanning}
+            className="hidden"
+          />
+        </label>
+
+        {scanNote && (
+          <div className="text-xs text-gold bg-gold/10 border border-gold/20 rounded-lg px-3 py-2 mb-4">
+            {scanNote}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {error && (

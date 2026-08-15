@@ -13,9 +13,10 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', require('./routes/auth.routes'));
-
-// Routes mount here in later milestones:
-// app.use('/api/expenses', require('./routes/expense.routes'));
+app.use('/api/expenses', require('./routes/expense.routes'));
+app.use('/api/income', require('./routes/income.routes'));
+app.use('/api/budgets', require('./routes/budget.routes'));
+app.use('/api/goals', require('./routes/goal.routes'));
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
